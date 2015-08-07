@@ -15,16 +15,13 @@ class Response
   attr_reader :flickr_type
   def initialize(h, type) # :nodoc:
     @flickr_type, @h = type, {}
-    methods = "class << self;"
     h.each {|k,v|
       @h[k] = case v
         when Hash  then Response.build(v, k)
         when Array then v.collect {|e| Response.build(e, k)}
         else v
       end
-      methods << "def #{k}; @h['#{k}'] end;"
     }
-    eval methods << "end"
   end
   def [](k); @h[k] end
   def to_s; @h["_content"] || super end
@@ -32,6 +29,15 @@ class Response
   def to_hash; @h end
   def marshal_dump; [@h, @flickr_type] end
   def marshal_load(data); initialize(*data) end
+
+  def method_missing(name, *args, &block)
+    if @h[name]
+      @h[name]
+    else
+      super
+    end
+  end
+
 end
 
 class ResponseList < Response
