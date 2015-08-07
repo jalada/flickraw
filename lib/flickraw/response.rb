@@ -31,8 +31,8 @@ class Response
   def marshal_load(data); initialize(*data) end
 
   def method_missing(name, *args, &block)
-    if @h[name]
-      @h[name]
+    if @h[name.to_s]
+      @h[name.to_s]
     else
       super
     end
